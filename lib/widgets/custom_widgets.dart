@@ -18,7 +18,7 @@ class MainView extends StatelessWidget {
     final List<Widget> screens = [
       HomeView(),
       ChatView(username: userid), //switch with chat page
-      LearningPage(),
+      LearningView(),
       ProfileView(username: userid),
     ];
     return Scaffold(

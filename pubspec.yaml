@@ -91,7 +91,13 @@ flutter:
     - assets/images/loginpage.jpg
     - assets/images/profile.jpg
     - assets/images/sendmail.png
-
+    - assets/learning/roadmap_icon.png
+    - assets/learning/pdf_icon.png
+    - assets/learning/profile_img.png
+    - assets/learning/playlist_icon.png
+    - assets/learning/projects_icon.png
+    - assets/learning/leading_icon.png
+    - assets/learning/lesson_icon.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

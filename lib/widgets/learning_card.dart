@@ -1,6 +1,5 @@
-import '../res/colors.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 class LearningCard extends StatelessWidget {
   const LearningCard({
     super.key,
@@ -14,29 +13,23 @@ class LearningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    double height = Get.height;
+    double width = Get.width;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05 , vertical: screenWidth * 0.03),
-      child: Container(
-        decoration: BoxDecoration(
-            color: ColorPalette.lightAquaGreen,
-            borderRadius: BorderRadius.circular(20)),
-        height: screenWidth * 0.5,
-        width: screenWidth * 0.4,
-        child: SizedBox(
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+          elevation: 4,
+          color: const Color(0xFFE3E3E3),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(imagePath),
-              Text(
-                cardName,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              )
+              Image.asset(imagePath,
+                height: width * 0.2,),
+              const SizedBox(height: 10,),
+              Text(cardName.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: width*0.05),)
             ],
-          ),
-        ),
+          )
       ),
     );
   }
