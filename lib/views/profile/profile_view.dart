@@ -62,7 +62,8 @@ class _StateProfileView extends State<ProfileView> {
           return Center(child: Text('No user data available.'));
         }
 
-        bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+        bool isPortrait =
+            MediaQuery.of(context).orientation == Orientation.portrait;
 
         return SingleChildScrollView(
           child: Padding(
@@ -97,7 +98,8 @@ class _StateProfileView extends State<ProfileView> {
                 child: CircleAvatar(
                   radius: MediaQuery.of(context).size.width * 0.15,
                   backgroundImage: NetworkImage(userData.avatarlink),
-                  onBackgroundImageError: (_, __) => Icon(Icons.person, size: MediaQuery.of(context).size.width * 0.10),
+                  onBackgroundImageError: (_, __) => Icon(Icons.person,
+                      size: MediaQuery.of(context).size.width * 0.10),
                 ),
               ),
               SizedBox(height: 10),
@@ -112,7 +114,8 @@ class _StateProfileView extends State<ProfileView> {
         //Personal Information Section
         Row(
           children: [
-            Text('Personal Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Personal Information',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Spacer(),
             IconButton(
               icon: Icon(Icons.edit),
@@ -147,7 +150,8 @@ class _StateProfileView extends State<ProfileView> {
         SizedBox(height: 20),
 
         // Utilities Section
-        Text('Utilities', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text('Utilities',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ProfileInfoTile(
           title: 'Account Settings',
           value: '',
@@ -190,7 +194,8 @@ class _StateProfileView extends State<ProfileView> {
                 child: CircleAvatar(
                   radius: MediaQuery.of(context).size.width * 0.10,
                   backgroundImage: NetworkImage(userData.avatarlink),
-                  onBackgroundImageError: (_, __) => Icon(Icons.person, size: MediaQuery.of(context).size.width * 0.10),
+                  onBackgroundImageError: (_, __) => Icon(Icons.person,
+                      size: MediaQuery.of(context).size.width * 0.10),
                 ),
               ),
               SizedBox(height: 10),
@@ -205,7 +210,9 @@ class _StateProfileView extends State<ProfileView> {
               // Personal Information Section
               Row(
                 children: [
-                  Text('Personal Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('Personal Information',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Spacer(),
                   IconButton(
                     icon: Icon(Icons.edit),
@@ -240,7 +247,8 @@ class _StateProfileView extends State<ProfileView> {
               SizedBox(height: 20),
 
               // Utilities Section
-              Text('Utilities', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Utilities',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ProfileInfoTile(
                 title: 'Account Settings',
                 value: '',
@@ -269,4 +277,3 @@ class _StateProfileView extends State<ProfileView> {
     );
   }
 }
-

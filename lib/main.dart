@@ -2,6 +2,7 @@ import 'package:communityapp/firebase_options.dart';
 import 'package:communityapp/models/message_model.dart';
 import 'package:communityapp/models/user_model.dart';
 import 'package:communityapp/views/auth/login_view.dart';
+
 import 'package:communityapp/widgets/custom_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage(),
+      home: MyHomePage(),
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         // Get the media query size

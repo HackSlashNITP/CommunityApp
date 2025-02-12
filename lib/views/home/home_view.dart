@@ -1,16 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communityapp/models/community_model.dart';
+import 'package:communityapp/models/course_model.dart';
+
+import 'package:communityapp/views/learning/roadmap_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:communityapp/controllers/home_controller.dart';
 import 'package:communityapp/res/colors.dart';
-import 'package:communityapp/views/auth/login_view.dart';
+
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get_core/get_core.dart';
+
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:communityapp/models/member_model.dart';
 import 'package:get/route_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -26,174 +31,149 @@ class _HomeViewState extends State<HomeView> {
   BottomNavController controller = Get.put(BottomNavController());
   @override
   Widget build(BuildContext context) {
-    final List<CommunityOption> options = [
-      //This is a list of options for the community(created )
-      //yeh hai apan ke community options hai
-      //run time mein data store hoga
-      CommunityOption(
-        //constructor ka purna istemal
-        title: 'WEB\nDEVELOPMENT',
-        icon: Icons.language,
-        route: '/web-development',
-      ),
-      CommunityOption(
-        title: 'ANDROID\nDEVELOPMENT',
-        icon: Icons.android,
-        route: '/android-development',
-      ),
-      CommunityOption(
-        title: 'ARTIFICIAL\nINTELLIGENCE',
-        icon: Icons.psychology,
-        route: '/ai',
-      ),
-      CommunityOption(
-        title: 'DATA\nSTRUCTURES',
-        icon: Icons.account_tree,
-        route: '/data-structures',
-      ),
-    ];
-
     final width = MediaQuery.of(context).size.width;
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: Container(
-            color: ColorPalette.pureWhite,
-            child: Column(
-              children: [
-                Container(
-                  color: ColorPalette.darkSlateBlue,
-                  child: Column(
-                    children: [
-                      _textField(),
-                      SizedBox(
-                        height: height * 0.02,
-                      ),
-                      Container(
-                          width: width,
-                          height: height * 0.28,
-                          decoration: BoxDecoration(
-                            color: ColorPalette.pureWhite,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30)),
-                          ),
-                          child: Column(
-                            children: [
-                              // carousel slider
-                              _curoselview(),
-                              // dot indicator
-                              Obx(() => DotsIndicator(
-                                    position:
-                                        controller.CarouselController.value,
-                                    dotsCount: 4,
-                                    decorator: DotsDecorator(
-                                      color: Colors.grey,
-                                      activeColor: ColorPalette.black,
-                                    ),
-                                  )),
-                            ],
-                          )),
-                    ],
-                  ),
-                ),
 
-                _topHead("Explore Community"),
-                SizedBox(
-                  height: isLandscape ? constraints.maxHeight * 0.6 : 160,
-                  child: ScrollConfiguration(
-                    behavior: const ScrollBehavior().copyWith(
-                      physics: const BouncingScrollPhysics(),
-                    ),
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: options.length,
-                      itemBuilder: (context, index) {
-                        return CommunityCard(option: options[index]);
-                      },
+    return OrientationBuilder(builder: (context, orientation) {
+      bool isLandscape = orientation == Orientation.landscape;
+      return Scaffold(
+        appBar: _buildAppBar(isLandscape),
+        body: LayoutBuilder(builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Container(
+              color: ColorPalette.pureWhite,
+              child: Column(
+                children: [
+                  Container(
+                    color: ColorPalette.darkSlateBlue,
+                    child: Column(
+                      children: [
+                        _textField(),
+                        SizedBox(
+                          height: height * 0.02,
+                        ),
+                        Container(
+                            width: width,
+                            height: height * 0.28,
+                            decoration: BoxDecoration(
+                              color: ColorPalette.pureWhite,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(30),
+                                  topRight: Radius.circular(30)),
+                            ),
+                            child: Column(
+                              children: [
+                                // carousel slider
+                                _curoselview(),
+                                // dot indicator
+                                Obx(() => DotsIndicator(
+                                      position:
+                                          controller.CarouselController.value,
+                                      dotsCount: 4,
+                                      decorator: DotsDecorator(
+                                        color: Colors.grey,
+                                        activeColor: ColorPalette.black,
+                                      ),
+                                    )),
+                              ],
+                            )),
+                      ],
                     ),
                   ),
-                ),
-                SizedBox(height: 2), // Spacing between sections
-                _topHead("Upcoming Events"),
-                FutureBuilder<List<EventOption>>(
-                  future: fetchAllEvents(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      // Loading spinner while fetching data
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      // Display an error if one occurred
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
 
-                    // If we get here, data is loaded or empty
-                    final events = snapshot.data ?? [];
-                    if (events.isEmpty) {
-                      return const Center(child: Text('No events found.'));
-                    }
-
-                    // Build your horizontal list using the loaded events
-                    return SizedBox(
-                      height: height * 0.32,
-                      child: ScrollConfiguration(
-                        behavior: const ScrollBehavior().copyWith(
-                          physics: const BouncingScrollPhysics(),
-                        ),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: events.length,
-                          itemBuilder: (context, index) {
-                            return EventCard(event: events[index]);
-                          },
-                        ),
+                  _topHead("Explore Community"),
+                  SizedBox(
+                    height: isLandscape ? constraints.maxHeight * 0.6 : 160,
+                    child: ScrollConfiguration(
+                      behavior: const ScrollBehavior().copyWith(
+                        physics: const BouncingScrollPhysics(),
                       ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 2), // Spacing between sections
-                _topHead("Recent Courses"),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                  child: FutureBuilder<List<Courses>>(
-                    future: fetchAllCourses(),
+                      child: myCommunityList(),
+                    ),
+                  ),
+                  SizedBox(height: 2), // Spacing between sections
+                  _topHead("Upcoming Events"),
+                  FutureBuilder<List<EventOption>>(
+                    future: fetchAllEvents(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        // Loading spinner while fetching data
+                        return const Center(child: CircularProgressIndicator());
                       }
                       if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
+                        // Display an error if one occurred
+                        return Center(child: Text('Error: ${snapshot.error}'));
                       }
-                      final courses = snapshot.data ?? [];
-                      return ListView.builder(
-                        // ...
-                        itemCount: courses.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) {
-                          return CourseCard(
-                            course: courses[index],
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                          );
-                        },
+
+                      // If we get here, data is loaded or empty
+                      final events = snapshot.data ?? [];
+                      if (events.isEmpty) {
+                        return const Center(child: Text('No events found.'));
+                      }
+
+                      // Build your horizontal list using the loaded events
+                      return SizedBox(
+                        height: isLandscape ? height * 0.36 : height * 0.36,
+                        child: ScrollConfiguration(
+                          behavior: const ScrollBehavior().copyWith(
+                            physics: const BouncingScrollPhysics(),
+                          ),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: events.length,
+                            itemBuilder: (context, index) {
+                              return EventCard(
+                                event: events[index],
+                                isLandscape: isLandscape,
+                              );
+                            },
+                          ),
+                        ),
                       );
                     },
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 2), // Spacing between sections
+                  _topHead("Recent Courses"),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    child: FutureBuilder<List<CourseModel>>(
+                      future: fetchAllCourses(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+                        final courses = snapshot.data ?? [];
+
+                        return ListView.builder(
+                          // ...
+                          itemCount: courses.length,
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) {
+                            return CourseCard(
+                              course: courses[index],
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height,
+                              isLandscape: isLandscape,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      }),
-    );
+          );
+        }),
+      );
+    });
   }
 
   Widget _topHead(String title) {
@@ -230,15 +210,15 @@ class _HomeViewState extends State<HomeView> {
 
   // App baar contaning menu option, hackslash logo and switch
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(bool isLanscape) {
     return PreferredSize(
-        preferredSize: Size.fromHeight(height * 0.2),
+        preferredSize: Size.fromHeight(isLanscape ? height * .3 : height * 0.2),
         child: Container(
           padding: EdgeInsets.only(
               top: height * 0.05, left: width * 0.03, right: width * 0.02),
           color: ColorPalette.darkSlateBlue,
           width: width * 0.9,
-          height: height * 0.125,
+          height: isLanscape ? height * .125 : height * 0.125,
           child: Row(
             children: [
               // menu option
@@ -436,56 +416,10 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
-class CommunityCard extends StatelessWidget {
-  final CommunityOption option;
-  const CommunityCard({super.key, required this.option});
-
-  @override
-  Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, option.route),
-        child: Container(
-          width: 140,
-          height: isLandscape ? 120 : null,
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                option.icon,
-                size: isLandscape ? 24 : 30,
-                color: Colors.black87,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                option.title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: isLandscape ? 12 : 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class EventCard extends StatelessWidget {
   final EventOption event;
-
-  const EventCard({super.key, required this.event});
+  final bool isLandscape;
+  const EventCard({super.key, required this.event, required this.isLandscape});
 
   @override
   Widget build(BuildContext context) {
@@ -504,7 +438,9 @@ class EventCard extends StatelessWidget {
           // Use a unique tag. This could be event.id, event.title, etc.
           tag: event.title,
           child: Container(
-            width: 280, // Wider than community cards
+            width: 280,
+            // height: Get.height * 2,
+            //height: Get.height * .5, // Wider than community cards
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(12),
@@ -515,42 +451,45 @@ class EventCard extends StatelessWidget {
                 // Hero animations look great if we also match the shape here:
                 ClipRRect(
                   borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
+                      const BorderRadius.vertical(top: Radius.circular(12)),
                   child: Image.network(
                     event.image,
-                    height: 140,
+                    //height: 140,
+                    height: isLandscape ? Get.height * .45 : Get.height * .21,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        event.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                SizedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        event.venue,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
+                        const SizedBox(height: 4),
+                        Text(
+                          event.venue,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
                         ),
-                      ),
-                      Text(
-                        event.time,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
+                        Text(
+                          event.time,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -561,6 +500,7 @@ class EventCard extends StatelessWidget {
     );
   }
 }
+
 class EventDetailPage extends StatelessWidget {
   final EventOption event;
 
@@ -591,8 +531,8 @@ class EventDetailPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(12)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(12)),
                       child: Image.network(
                         event.image,
                         width: double.infinity,
@@ -629,7 +569,7 @@ class EventDetailPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Event Info \n '+ event.eventInfo,
+                            'Event Info \n ' + event.eventInfo,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[800],
@@ -649,64 +589,321 @@ class EventDetailPage extends StatelessWidget {
   }
 }
 
+Widget myCommunityList() {
+  return FutureBuilder<List<CommunityModel>>(
+      future: fetchAllCommunity(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            final data = snapshot.data!;
 
-
-
-class CommunityOption {
-  final String title;
-  final IconData icon;
-  final String route;
-
-  CommunityOption({
-    required this.title,
-    required this.icon,
-    required this.route,
-  });
+            return SizedBox(
+              height: 120,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    CommunityModel currCommunity = data[index];
+                    return Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Get.to(CommunityView(myComm: currCommunity));
+                          },
+                          child: Container(
+                            height: 150,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                              color: Color(0xffE3E3E3),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.network(
+                                  currCommunity.logo!,
+                                  height: 90,
+                                  width: 90,
+                                ),
+                                Text(
+                                  currCommunity.category,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    );
+                  }),
+            );
+          } else {
+            return Text("Some error occured");
+          }
+        }
+        return Text("Some error occured");
+      });
 }
 
-class WebDevelopmentScreen extends StatelessWidget {
-  const WebDevelopmentScreen({super.key});
+Future<List<CommunityModel>> fetchAllCommunity() async {
+  final QuerySnapshot snapshot =
+      await FirebaseFirestore.instance.collection('Communities').get();
+  return snapshot.docs
+      .map((doc) => CommunityModel.fromMap(doc.data() as Map<String, dynamic>))
+      .toList();
+}
+
+Future<List<CourseModel>> fetchAllCourses() async {
+  final QuerySnapshot snapshot =
+      await FirebaseFirestore.instance.collection('Courses').get();
+
+  return snapshot.docs
+      .map((doc) => CourseModel.fromJson(doc.data() as Map<String, dynamic>))
+      .toList();
+}
+
+PreferredSizeWidget communityAppBar(String name) {
+  return AppBar(
+    surfaceTintColor: Colors.transparent,
+    shadowColor: Colors.transparent,
+    title: Text(name),
+  );
+}
+
+class CommunityView extends StatelessWidget {
+  final CommunityModel myComm;
+  CommunityView({super.key, required this.myComm});
+  Future<void> _launchURL(String link) async {
+    final Uri url = Uri.parse(link);
+
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Team 405 waale jyada hi hawa me udhte hain!')),
+    int count = ((myComm.members!.length) ~/ 2);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: communityAppBar(myComm.category),
+      body: OrientationBuilder(builder: (context, orinetation) {
+        bool isPortrait = orinetation == Orientation.portrait;
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: isPortrait ? 25 : 45),
+                child: SizedBox(
+                  child: Expanded(
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
+                          ),
+                          child: Image.network(myComm.image),
+                        ),
+                        Container(
+                          //height: Get.height * .23,
+                          //width: MediaQuery.of(context).size.width * .85,
+                          decoration: const BoxDecoration(
+                            color: Color(0xffF1F1F1),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(10),
+                              bottomRight: Radius.circular(10),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  myComm.name,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18),
+                                ),
+                                SizedBox(
+                                  height: Get.height * .01,
+                                ),
+                                Text(
+                                  myComm.info ?? "",
+                                  style: TextStyle(fontSize: 13.5),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: Get.height * .02,
+              ),
+              SizedBox(
+                height: Get.height * .02,
+              ),
+              Text(
+                "Coordinators",
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 25),
+              ),
+              SizedBox(
+                height: Get.height * .01,
+              ),
+              SizedBox(
+                //height: Get.height * .02,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: myComm.coordinators!.length,
+                    itemBuilder: (context, index) {
+                      MemberModel currCoordinator = myComm.coordinators![index];
+                      return Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              if (currCoordinator.linkedin != null) {
+                                _launchURL(currCoordinator.linkedin!);
+                              }
+                            },
+                            child: currCoordinator.image == null
+                                ? Image.network(
+                                    "https://static.vecteezy.com/system/resources/thumbnails/002/002/403/small/man-with-beard-avatar-character-isolated-icon-free-vector.jpg")
+                                : photoFrame(currCoordinator.image!),
+                          ),
+                          Text(currCoordinator.name),
+                          Text(
+                            currCoordinator.position,
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          SizedBox(
+                            height: Get.height * .02,
+                          ),
+                        ],
+                      );
+                    }),
+              ),
+              SizedBox(height: Get.height * 0.05),
+              Text(
+                "Members",
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 25),
+              ),
+              SizedBox(
+                height: Get.height * .02,
+              ),
+              ListView.builder(
+                  itemCount: count,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    int curr_index = index * 2;
+                    MemberModel firstMember = myComm.members![curr_index];
+                    MemberModel secondMember = myComm.members![curr_index + 1];
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    if (firstMember.linkedin != null) {
+                                      _launchURL(firstMember.linkedin!);
+                                    }
+                                  },
+                                  child: firstMember.image == null
+                                      ? Image.network(
+                                          "https://static.vecteezy.com/system/resources/thumbnails/002/002/403/small/man-with-beard-avatar-character-isolated-icon-free-vector.jpg")
+                                      : photoFrame(firstMember.image!),
+                                ),
+                                SizedBox(
+                                  height: Get.height * .01,
+                                ),
+                                Text(firstMember.name),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    if (secondMember.linkedin != null) {
+                                      _launchURL(secondMember.linkedin!);
+                                    }
+                                  },
+                                  child: secondMember.image == null
+                                      ? Image.network(
+                                          "https://static.vecteezy.com/system/resources/thumbnails/002/002/403/small/man-with-beard-avatar-character-isolated-icon-free-vector.jpg")
+                                      : photoFrame(secondMember.image!),
+                                ),
+                                SizedBox(
+                                  height: Get.height * .01,
+                                ),
+                                Text(secondMember.name),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: Get.height * .02,
+                        ),
+                      ],
+                    );
+                  }),
+              myComm.members!.length % 2 == 0
+                  ? SizedBox()
+                  : Column(
+                      children: [
+                        photoFrame(
+                            myComm.members![myComm.members!.length - 1].image!),
+                        SizedBox(
+                          height: Get.height * .01,
+                        ),
+                        Text(myComm.members![myComm.members!.length - 1].name),
+                      ],
+                    ),
+              SizedBox(
+                height: Get.height * .02,
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
 
-class AndroidDevelopmentScreen extends StatelessWidget {
-  const AndroidDevelopmentScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-          child: Text('FLutter is the best!(apne muh se tarif not good)')),
-    );
-  }
-}
-
-class AIScreen extends StatelessWidget {
-  const AIScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Generating.....')),
-    );
-  }
-}
-
-class DataStructuresScreen extends StatelessWidget {
-  const DataStructuresScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Anshuman Gangwar is a good boy!')),
-    );
-  }
+Widget photoFrame(String path) {
+  return CircleAvatar(
+    radius: 70,
+    backgroundColor: Color(0xff00FF9D),
+    child: CircleAvatar(
+      backgroundColor: Colors.white,
+      radius: 68,
+      child: CircleAvatar(
+        radius: 62,
+        backgroundImage: NetworkImage(path),
+      ),
+    ),
+  );
 }
 
 class EventOption {
@@ -727,13 +924,12 @@ class EventOption {
   });
   factory EventOption.fromFirestore(Map<String, dynamic> data, String docId) {
     return EventOption(
-      title: data['title'] ?? docId,
-      image: data['imageUrl'] ?? 'assets/images/logo.png',
-      venue: 'Venue: ' + data['venue'] ?? 'Venue: TBA',
-      time: 'Time: ' + data['time'] ?? 'Time: TBA',
-      route: '/defaultRoute',
-      eventInfo: data['eventInfo'] ?? 'Will Update Soon!'
-    );
+        title: data['title'] ?? docId,
+        image: data['imageUrl'] ?? 'assets/images/logo.png',
+        venue: 'Venue: ' + data['venue'] ?? 'Venue: TBA',
+        time: 'Time: ' + data['time'] ?? 'Time: TBA',
+        route: '/defaultRoute',
+        eventInfo: data['eventInfo'] ?? 'Will Update Soon!');
   }
 }
 
@@ -790,16 +986,18 @@ class Courses {
     );
   }
 }
+
 class CourseCard extends StatelessWidget {
-  final Courses course;
+  final CourseModel course;
   final double width;
   final double height;
-
+  final bool isLandscape;
   const CourseCard({
     Key? key,
     required this.course,
     required this.width,
     required this.height,
+    required this.isLandscape,
   }) : super(key: key);
 
   @override
@@ -817,8 +1015,8 @@ class CourseCard extends StatelessWidget {
         tag: course.title, // must match the detail screen Hero tag
         child: Container(
           // styling similar to your original code
-          width: width * 0.9,
-          height: height * 0.11,
+          width: isLandscape ? width * 1 : width * 0.9,
+          height: isLandscape ? height * .2 : height * 0.11,
           margin: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
@@ -827,7 +1025,7 @@ class CourseCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
                   course.image,
-                  height: height * 0.13,
+                  height: isLandscape ? height * .22 : height * 0.13,
                   width: width * 0.3,
                   fit: BoxFit.cover,
                 ),
@@ -870,8 +1068,9 @@ class CourseCard extends StatelessWidget {
     );
   }
 }
+
 class CourseDetailPage extends StatelessWidget {
-  final Courses course;
+  final CourseModel course;
 
   const CourseDetailPage({Key? key, required this.course}) : super(key: key);
 
@@ -944,13 +1143,27 @@ class CourseDetailPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              course.subtitle!,
+                              course.subtitle,
                               style: const TextStyle(fontSize: 14),
                             ),
                           ],
                         ],
                       ),
                     ),
+                    ElevatedButton(
+                        onPressed: () {
+                          Get.to(MyRoadMapScreen(myCourse: course));
+                        },
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStatePropertyAll(Colors.grey[200])),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("RoadMap"),
+                            Icon(Icons.keyboard_arrow_right_outlined)
+                          ],
+                        )),
                   ],
                 ),
               ),
@@ -961,13 +1174,3 @@ class CourseDetailPage extends StatelessWidget {
     );
   }
 }
-Future<List<Courses>> fetchAllCourses() async {
-  final querySnapshot =
-  await FirebaseFirestore.instance.collection('courses').get();
-
-  return querySnapshot.docs.map((doc) {
-    final data = doc.data();
-    return Courses.fromFirestore(data, doc.id);
-  }).toList();
-}
-

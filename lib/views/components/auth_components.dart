@@ -36,32 +36,35 @@ class AuthComponents {
     required VoidCallback toggleObscureText,
   }) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 360),
-      child: Obx(()=> TextField(
-        controller: controller,
-        obscureText: obscureText.value,
-        decoration: InputDecoration(
-          hintText: 'Password',
-          hintStyle: TextStyle(fontSize: isPortrait ? 16.sp : 10.sp),
-          prefixIcon: Padding(
-            padding: EdgeInsets.only(right: 10.w),
-            child: Icon(
-              CupertinoIcons.lock,
-              color: const Color.fromARGB(255, 65, 189, 115),
-              size: isPortrait ? 24.r : 20.r,
+        constraints: BoxConstraints(maxWidth: 360),
+        child: Obx(
+          () => TextField(
+            controller: controller,
+            obscureText: obscureText.value,
+            decoration: InputDecoration(
+              hintText: 'Password',
+              hintStyle: TextStyle(fontSize: isPortrait ? 16.sp : 10.sp),
+              prefixIcon: Padding(
+                padding: EdgeInsets.only(right: 10.w),
+                child: Icon(
+                  CupertinoIcons.lock,
+                  color: const Color.fromARGB(255, 65, 189, 115),
+                  size: isPortrait ? 24.r : 20.r,
+                ),
+              ),
+              suffixIcon: IconButton(
+                onPressed: toggleObscureText,
+                icon: Obx(() => Icon(
+                      obscureText.value
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: const Color.fromARGB(255, 174, 179, 176),
+                      size: isPortrait ? 24.r : 20.r,
+                    )),
+              ),
             ),
           ),
-          suffixIcon: IconButton(
-            onPressed: toggleObscureText,
-            icon: Obx(() => Icon(
-                  obscureText.value ? Icons.visibility : Icons.visibility_off,
-                  color: const Color.fromARGB(255, 174, 179, 176),
-                  size: isPortrait ? 24.r : 20.r,
-                )),
-          ),
-        ),
-      ),
-    ));
+        ));
   }
 
   Widget buildActionText(
@@ -87,7 +90,8 @@ class AuthComponents {
     );
   }
 
-  Widget buildbtn(String text, RxBool isLoading,bool isPortrait ,void Function() function) {
+  Widget buildbtn(String text, RxBool isLoading, bool isPortrait,
+      void Function() function) {
     return Obx(
       () => ElevatedButton(
         onPressed: function,
