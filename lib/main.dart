@@ -21,6 +21,7 @@ void main() async {
   Hive.registerAdapter(HiveUserAdapter());
   runApp(const GetMaterialApp(
     home: MyApp(),
+    debugShowCheckedModeBanner: false,
   ));
 }
 

@@ -2,7 +2,10 @@ import 'package:communityapp/res/colors.dart';
 import 'package:communityapp/views/learning/ai_chat_view.dart';
 import 'package:communityapp/views/learning/blogs/blogpage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import '../../controllers/ai_chat_controller.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import '../../widgets/learning_card.dart';
 import '../youtube/PlaylistsScreen.dart';
 
@@ -14,203 +17,136 @@ class LearningView extends StatelessWidget {
 
   final String? name;
   final String? uid;
+
   @override
   Widget build(BuildContext context) {
+    final user = types.User(
+      id: uid ?? "random_17263274",
+      firstName: name ?? "user",
+    );
+    Get.put(AiChatController(user: user));
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              "assets/learning/leading_icon.png",
-              height: 30,
-            ),
-            const Text(
-              ' Hackslash',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-
-        backgroundColor:
-            const Color(0xFF223345), // Set your desired background color
-        actions: [
-          Switch(
-            value: false, // This can be controlled with a state variable
-            onChanged: (value) {
-              // Handle toggle action
-            },
-          ),
-        ],
+        body: Container(
+      height: Get.height,
+      width: Get.width,
+      decoration: BoxDecoration(
+        color: ColorPalette.bgColor,
       ),
-      body: Container(
-        color: const Color(0xFF223345),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-          ),
-          height: height * 1,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      child: SafeArea(
+        child: Stack(
+          children: [
+            Positioned(
+              right: 0,
+              top: 0,
+              child: SvgPicture.asset('assets/svgs/box.svg'),
+            ),
+            Positioned(
+              right: 0,
+              top: Get.height * 0.1,
+              child: SvgPicture.asset('assets/svgs/box.svg'),
+            ),
+            Positioned(
+              top: Get.height * 0.4,
+              left: 0,
+              child: SvgPicture.asset('assets/svgs/rectangle.svg'),
+            ),
+            Positioned(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Hello ${name ?? 'User'}',
-                          style: TextStyle(
-                            fontSize: 45,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Let's Continue",
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Text(
-                          "Learning!",
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.grey,
-                          ),
-                        ),
+                        Text("Learning\nOptions",
+                            style: TextStyle(
+                              color: ColorPalette.pureWhite,
+                              fontWeight: FontWeight.w900,
+                              fontSize: width * 0.1,
+                            )),
+                        Image.asset(
+                          'assets/learning/book.png',
+                          height: width * 0.15,
+                          width: width * 0.15,
+                        )
                       ],
                     ),
-                    const SizedBox(width: 16),
-                    CircleAvatar(
-                      radius: width * 0.15,
-                      backgroundImage:
-                          const AssetImage("assets/learning/profile_img.png"),
-                      backgroundColor: const Color(0xFFD9D9D9),
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(()=>AiChatView());
+                      },
+                      child: Container(
+                        height: Get.height * 0.05,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        margin: EdgeInsets.symmetric(vertical: 24),
+                        decoration: BoxDecoration(
+                            color: ColorPalette.pureWhite.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("AI Search ?",
+                                style: TextStyle(
+                                  color: ColorPalette.pureWhite,
+                                  fontSize: width * 0.05,
+                                )),
+                            Icon(
+                              Icons.search,
+                              color: ColorPalette.pureWhite,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.1,
+                    ),
+                    Expanded(
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        children: learningWidget,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 50),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Your Lessons',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Image.asset(
-                      "assets/learning/lesson_icon.png",
-                      height: 30,
-                    )
-                  ],
-                ),
-                const SizedBox(height: 5),
-                const Divider(
-                  thickness: 2,
-                  color: Colors.blueGrey,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                    onPressed: () {
-                      _buildSearchUI();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorPalette.brightEmeraldGreen,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
-                        ),
-                      ),
-                      fixedSize: Size(
-                        width * 0.5,
-                        width * 0.12,
-                      ),
-                    ),
-                    child: Center(
-                      child: TextButton(
-                        onPressed: () {
-                          Get.to(AiChatView(
-                            uid: uid ?? "random_id_9855jh35iy5",
-                            name: name ?? "User",
-                          ));
-                        },
-                        child: Text(
-                          "AI Search",
-                          style:
-                              TextStyle(color: Color(0xFF223345), fontSize: 16),
-                        ),
-                      ),
-                    )),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    padding: const EdgeInsets.all(10),
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 5.0 / 6.0,
-                    children: learningCards.map((card) {
-                      return LearningCard(
-                        cardName: card["name"]!,
-                        imagePath: card["imagePath"]!,
-                        onTap: card[
-                            "onTap"], // Assign the specific onTap function here
-                      );
-                    }).toList(),
-                  ),
-                )
-              ],
-            ),
-          ),
+              ),
+            )
+          ],
         ),
       ),
-    );
+    ));
   }
 
-  final List<Map<String, dynamic>> learningCards = [
-    {
-      "name": "Roadmap",
-      "imagePath": "assets/learning/roadmap_icon.png",
-      "onTap": () => print("Roadmap tapped"),
-    },
-    {
-      "name": "Playlist",
-      "imagePath": "assets/learning/playlist_icon.png",
-      "onTap": () => Get.to(
-            () => PlaylistsScreen(
-              channelId: 'UCFEHqTxq-jVK_jl263fz0kg',
-            ),
-          ),
-    },
-    {
-      "name": "Blogs",
-      "imagePath": "assets/learning/projects_icon.png",
-      "onTap": () => Get.to(Blog_Page())
-    },
-    {
-      "name": "Pdf Notes",
-      "imagePath": "assets/learning/pdf_icon.png",
-      "onTap": () => print("Pdf Notes tapped"),
-    },
+  final List<LearningCard> learningWidget = [
+    LearningCard(
+      imagePath: "assets/learning/roadmap_icon.png",
+      cardName: "Roadmap",
+      onTap: () => print("Roadmap tapped"),
+    ),
+    LearningCard(
+      imagePath: "assets/learning/playlist_icon.png",
+      cardName: "Playlist",
+      onTap: () => Get.to(
+        () => PlaylistsScreen(
+          channelId: 'UCFEHqTxq-jVK_jl263fz0kg',
+        ),
+      ),
+    ),
+    LearningCard(
+        imagePath: "assets/learning/projects_icon.png",
+        cardName: "Blogs",
+        onTap: () => Get.to(Blog_Page())),
+    LearningCard(
+      imagePath: "assets/learning/pdf_icon.png",
+      cardName: "Pdf Notes",
+      onTap: () => print("Pdf Notes tapped"),
+    ),
+    LearningCard(
+      imagePath: "assets/learning/html.png",
+      cardName: "Links",
+      onTap: () => print("Important Links"),
+    )
   ];
-  _buildSearchUI() {
-    if (Get.isBottomSheetOpen!) return;
-    return Get.bottomSheet(
-        elevation: 4,
-        backgroundColor: Color(0xFF223345),
-        isDismissible: true,
-        enableDrag: true,
-        persistent: true,
-        Column());
-  }
 }

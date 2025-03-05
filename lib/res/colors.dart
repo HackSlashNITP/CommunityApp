@@ -14,5 +14,6 @@ class ColorPalette {
   // Neutral Colors
   static const Color pureWhite = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
+  static const Color bgColor = Color(0xFF110E2B);
 }
 

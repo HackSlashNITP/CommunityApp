@@ -69,6 +69,7 @@ dependencies:
   permission_handler: ^11.3.1
   flutter_markdown: ^0.7.6
   youtube_player_flutter: ^9.1.1
+  flutter_svg: ^2.0.17
 
 
 dev_dependencies:
@@ -101,13 +102,8 @@ flutter:
     - assets/images/profile.jpg
     - assets/images/sendmail.png
     - assets/images/
-    - assets/learning/roadmap_icon.png
-    - assets/learning/pdf_icon.png
-    - assets/learning/profile_img.png
-    - assets/learning/playlist_icon.png
-    - assets/learning/projects_icon.png
-    - assets/learning/leading_icon.png
-    - assets/learning/lesson_icon.png
+    - assets/learning/
+    - assets/svgs/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

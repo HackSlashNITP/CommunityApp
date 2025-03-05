@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class LearningCard extends StatelessWidget {
   const LearningCard(
@@ -14,14 +15,15 @@ class LearningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = Get.height;
     double width = Get.width;
 
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-          elevation: 4,
-          color: const Color(0xFFE3E3E3),
+      child: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              color: const Color(0xFFE3F5FF),
+              borderRadius: BorderRadius.circular(20)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
